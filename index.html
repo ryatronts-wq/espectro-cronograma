@@ -108,6 +108,13 @@
   .g-mini li::before{content:"·"; position:absolute; left:2px; color:var(--violet2); font-weight:800;}
   .bio-mock{background:#0d0820; border:1px dashed var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:var(--txt); margin-top:6px;}
   .bio-mock .muted{color:var(--mut);}
+  .pub-card{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:18px 20px; margin-bottom:16px;}
+  .pub-card h3{font-size:16px; margin-bottom:6px;}
+  .pub-h{font-size:12px; color:var(--violet2); font-weight:600; margin:14px 0 4px; letter-spacing:.5px;}
+  .pub-t{background:#0d0820; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.6; color:var(--txt); white-space:pre-wrap; word-break:break-word; font-family:inherit;}
+  .cpbtn{margin-top:6px; background:rgba(139,92,246,.18); color:var(--violet2); border:1px solid var(--line); border-radius:8px; padding:5px 12px; font-size:12px; cursor:pointer; font-family:inherit;}
+  .cpbtn:hover{background:rgba(139,92,246,.3); color:#fff;}
+  .cpbtn.ok{background:rgba(52,211,153,.2); color:var(--green); border-color:var(--green);}
 </style>
 </head>
 <body>
@@ -124,6 +131,7 @@
   <div class="tabs">
     <button id="tb1" class="tab on" onclick="showTab(1)">Cronograma</button>
     <button id="tb2" class="tab" onclick="showTab(2)">Guía de canales</button>
+    <button id="tb3" class="tab" onclick="showTab(3)">Publicaciones</button>
   </div>
 
   <div id="tab-crono">
@@ -299,6 +307,115 @@
     </div>
   </div>
 
+  <div id="tab-pub" style="display:none">
+    <p style="color:var(--mut); font-size:14px; margin-bottom:18px; line-height:1.7;">Descripciones listas para copiar y pegar. Esta pestaña la iremos actualizando con cada video nuevo. 📋</p>
+
+    <div class="pub-card">
+      <div class="g-h">Recomendaciones al publicar (todas las redes)</div>
+      <div class="g-mini" style="margin-bottom:0;"><ul>
+        <li>Sube el máster <b>9:16 sin marca de agua</b> · mismo @handle y foto (tu Ojo) en las 4</li>
+        <li><b>YouTube:</b> marca "no es para niños" (SIN 18+) · pon portada · activa etiqueta de IA si la pide</li>
+        <li><b>TikTok/IG/FB:</b> caption corto + <b>fuentes en comentario fijado</b> · etiqueta de IA · NO marques 18+</li>
+        <li>Horario: <b>19:30 YT · 19:50 TikTok · 20:10 IG · 20:30 FB</b> (Lun·Mié·Vie)</li>
+        <li>Responde los primeros comentarios el día 1 (impulsa el alcance)</li>
+      </ul></div>
+    </div>
+
+    <div class="pub-card">
+      <h3>🩵 Mito #1 — "Es solo una fase" <span class="badge b-t1">Lun</span></h3>
+      <div class="pub-h">▶️ YOUTUBE · TÍTULO</div>
+      <div class="pub-t">¿"Es solo una fase"? Esto dice la ciencia sobre identidad y orientación | ESPECTRO</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">▶️ YOUTUBE · DESCRIPCIÓN</div>
+      <div class="pub-t">"Es solo una fase" es de las frases que más se repiten… y la que la ciencia más desmiente. Te explico qué muestran los estudios de seguimiento y por qué la identidad y la orientación no son un trastorno ni algo pasajero. 🧠
+
+📚 Fuentes:
+• APA (2008) – Orientación sexual
+• APA (2009) – "Terapias de conversión": ineficaces y dañinas
+• Olson et al. (2022), Pediatrics – Estabilidad de la identidad a 5 años
+• OMS, CIE-11 (2019)
+
+Contenido educativo. Nuevos shorts Lun · Mié · Vie.
+#Shorts #educación #psicología #identidad #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">🎵 TIKTOK · CAPTION</div>
+      <div class="pub-t">"Es solo una fase"… ¿de verdad? Esto dice la ciencia 🧠 Fuentes en el comentario fijado 📌
+#educación #psicología #identidad #aprendeentiktok #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📷 INSTAGRAM · CAPTION</div>
+      <div class="pub-t">"Es solo una fase" es lo que más se dice sobre la identidad y la orientación… y lo que la ciencia más desmiente. 🧠 Guárdalo y mándaselo a quien lo necesite.
+
+Fuentes 📌 en comentarios.
+#educación #psicología #identidad #divulgación #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">👍 FACEBOOK · DESCRIPCIÓN</div>
+      <div class="pub-t">"Es solo una fase" se repite mucho sobre la identidad y la orientación. Pero los estudios de seguimiento muestran que, en la mayoría, se mantienen estables — y la APA no las considera un trastorno ni algo que se "cure". 🧠
+
+📚 Fuentes: APA (2008; 2009); Olson et al. (2022), Pediatrics; OMS CIE-11 (2019).
+#educación #psicología #identidad #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📌 COMENTARIO FIJADO (TikTok/IG)</div>
+      <div class="pub-t">📚 Fuentes: APA (2008; 2009); Olson et al. (2022), Pediatrics; OMS CIE-11 (2019).</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+    </div>
+
+    <div class="pub-card">
+      <h3>🔵 Las 3 dimensiones <span class="badge b-t2">Mié · T2</span></h3>
+      <div class="pub-h">▶️ YOUTUBE · TÍTULO</div>
+      <div class="pub-t">Sexo, identidad y orientación: 3 cosas distintas que tu cerebro no elige | ESPECTRO</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">▶️ YOUTUBE · DESCRIPCIÓN</div>
+      <div class="pub-t">Tu cerebro registra tu sexualidad en tres lugares distintos: sexo biológico, identidad de género y orientación. Y son independientes entre sí. Te explico qué dice la evidencia. 🧠
+
+📚 Fuentes:
+• García-Falgueras & Swaab (2010), Endocrine Development
+• APA (2008; 2015)
+• OMS, CIE-11
+
+Contenido educativo · no es para niños. Nuevos shorts Lun · Mié · Vie.
+#Shorts #educación #neurociencia #identidad #sexualidad</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">🎵 TIKTOK · CAPTION</div>
+      <div class="pub-t">Tu cerebro registra tu sexualidad en 3 lugares distintos 🧠 (y la ciencia lo confirma). Fuentes 📌 en comentario fijado.
+#educación #neurociencia #psicología #ciencia #aprendeentiktok</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📷 INSTAGRAM · CAPTION</div>
+      <div class="pub-t">Sexo biológico, identidad de género y orientación son tres cosas distintas e independientes. Te explico qué dice la ciencia 🧠✨ Guárdalo.
+
+Fuentes 📌 en comentarios.
+#educación #neurociencia #divulgación #identidad</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">👍 FACEBOOK · DESCRIPCIÓN</div>
+      <div class="pub-t">Sexo biológico, identidad de género y orientación: tres dimensiones distintas e independientes de la sexualidad humana. Esto dice la evidencia. 🧠
+
+📚 Fuentes: García-Falgueras & Swaab (2010); APA (2008; 2015); OMS CIE-11.
+#educación #neurociencia #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📌 COMENTARIO FIJADO (TikTok/IG)</div>
+      <div class="pub-t">📚 Fuentes: García-Falgueras & Swaab (2010), Endocrine Development; APA (2008; 2015); OMS CIE-11.</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+    </div>
+
+    <div class="pub-card">
+      <h3>🌹 Romántico vs sexual <span class="badge b-t1">Vie</span></h3>
+      <div class="pub-h">▶️ YOUTUBE · TÍTULO</div>
+      <div class="pub-t">Atracción romántica vs sexual: por qué NO son lo mismo | ESPECTRO</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">▶️ YOUTUBE · DESCRIPCIÓN</div>
+      <div class="pub-t">Puedes amar a alguien sin desearlo, y desear a alguien sin amarlo. La psicología distingue dos sistemas: atracción romántica y atracción sexual, y funcionan por separado. Te explico. ❤️🧠
+
+📚 Fuentes:
+• Diamond (2003), Psychological Review
+• Fisher et al. (2006), Phil. Trans. R. Soc. B
+• Bogaert (2004; 2012) – Asexualidad
+
+Contenido educativo. Nuevos shorts Lun · Mié · Vie.
+#Shorts #educación #psicología #relaciones #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">🎵 TIKTOK · CAPTION</div>
+      <div class="pub-t">Puedes amar sin desear, y desear sin amar. No es contradicción 🧠❤️ Fuentes 📌 en comentario fijado.
+#educación #psicología #relaciones #aprendeentiktok #ciencia</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📷 INSTAGRAM · CAPTION</div>
+      <div class="pub-t">Atracción romántica y sexual son dos sistemas distintos: por eso no siempre coinciden. 🧠❤️ Guárdalo y compártelo.
+
+Fuentes 📌 en comentarios.
+#educación #psicología #relaciones #divulgación</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">👍 FACEBOOK · DESCRIPCIÓN</div>
+      <div class="pub-t">Puedes amar a alguien sin desearlo, y desear a alguien sin amarlo. La psicología distingue la atracción romántica de la sexual: son sistemas separados. ❤️🧠
+
+📚 Fuentes: Diamond (2003); Fisher et al. (2006); Bogaert (2004; 2012).
+#educación #psicología #relaciones</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+      <div class="pub-h">📌 COMENTARIO FIJADO (TikTok/IG)</div>
+      <div class="pub-t">📚 Fuentes: Diamond (2003), Psychological Review; Fisher et al. (2006); Bogaert (2004; 2012).</div><button class="cpbtn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
 <script>
 const KEY='espectro-uploads-v2';
 const PLAT=[['yt','YT'],['tt','TikTok'],['ig','IG'],['fb','FB']];
@@ -381,10 +498,14 @@ function updateStats(){
 }
 function set(id,txt,bar,frac){document.getElementById(id).textContent=txt;document.getElementById(bar).style.width=Math.round(frac*100)+'%';}
 function showTab(n){
-  document.getElementById('tab-crono').style.display=n===1?'':'none';
-  document.getElementById('tab-guia').style.display=n===2?'':'none';
-  document.getElementById('tb1').classList.toggle('on',n===1);
-  document.getElementById('tb2').classList.toggle('on',n===2);
+  ['crono','guia','pub'].forEach((name,i)=>{
+    document.getElementById('tab-'+name).style.display=(n===i+1)?'':'none';
+    document.getElementById('tb'+(i+1)).classList.toggle('on',n===i+1);
+  });
+}
+function cp(b){
+  const t=b.previousElementSibling.textContent;
+  navigator.clipboard.writeText(t).then(()=>{b.textContent='¡Copiado!';b.classList.add('ok');setTimeout(()=>{b.textContent='Copiar';b.classList.remove('ok');},1500);}).catch(()=>{b.textContent='Selecciona y copia';});
 }
 
 const SD_KEY='espectro-start-v2';
