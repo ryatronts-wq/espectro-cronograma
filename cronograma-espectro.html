@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESPECTRO — Cronograma de producción</title>
+<style>
+  :root{
+    --bg:#080318; --panel:rgba(255,255,255,0.04); --line:rgba(167,139,250,0.18);
+    --txt:#F1EFFA; --mut:#A9A3C9; --violet:#8B5CF6; --violet2:#A78BFA; --magenta:#E0218A;
+    --gold:#E8A53D; --green:#34d399;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter','Segoe UI',system-ui,sans-serif; color:var(--txt);
+    background:
+      radial-gradient(60% 40% at 22% 12%, rgba(91,33,182,.45) 0%, transparent 60%),
+      radial-gradient(55% 45% at 85% 88%, rgba(192,38,140,.35) 0%, transparent 58%),
+      var(--bg);
+    background-attachment:fixed; min-height:100vh; padding:32px 18px 80px;}
+  .wrap{max-width:1080px; margin:0 auto;}
+  header{display:flex; align-items:center; gap:18px; margin-bottom:28px; flex-wrap:wrap;}
+  .eye{width:64px; height:64px; border-radius:50%; flex:0 0 auto; position:relative;
+    background:conic-gradient(from 0deg,#8B5CF6,#38E0D0,#34d399,#E8A53D,#E0218A,#8B5CF6);
+    box-shadow:0 0 28px rgba(139,92,246,.55), 0 0 0 2px rgba(167,139,250,.5);}
+  .eye::after{content:""; position:absolute; inset:38%; border-radius:50%; background:#08030f;}
+  .eye::before{content:""; position:absolute; left:30%; top:30%; width:8px; height:8px; border-radius:50%; background:#fff; z-index:2;}
+  h1{font-size:30px; font-weight:800; letter-spacing:7px;}
+  .tag{font-size:13px; letter-spacing:4px; color:var(--violet2); margin-top:2px;}
+  .sub{color:var(--mut); font-size:14px; margin-top:4px;}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:22px;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px 18px;}
+  .stat .n{font-size:28px; font-weight:800;}
+  .stat .l{font-size:12px; color:var(--mut); margin-top:2px;}
+  .bar{height:10px; border-radius:8px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:10px;}
+  .bar > i{display:block; height:100%; width:0; border-radius:8px;
+    background:linear-gradient(90deg,var(--violet),var(--magenta)); transition:width .4s ease;}
+  .next{background:linear-gradient(90deg, rgba(139,92,246,.22), rgba(224,33,138,.14));
+    border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin-bottom:26px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .next .k{font-size:12px; letter-spacing:2px; color:var(--violet2);}
+  .next .v{font-size:18px; font-weight:700;}
+  .next .pill{margin-left:auto; font-size:12px; padding:6px 12px; border-radius:20px; background:rgba(255,255,255,.07); color:var(--mut);}
+  .tema{background:var(--panel); border:1px solid var(--line); border-radius:18px; margin-bottom:16px; overflow:hidden;}
+  .thead{display:flex; align-items:center; gap:12px; padding:14px 20px; cursor:pointer; user-select:none;}
+  .tnum{width:30px; height:30px; border-radius:9px; background:rgba(139,92,246,.18); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--violet2); flex:0 0 auto;}
+  .ttitle{font-weight:600; font-size:17px;}
+  .badge{font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600;}
+  .b-t1{background:rgba(93,202,165,.16); color:#9FE1CB;}
+  .b-t2{background:rgba(239,159,39,.16); color:#FAC775;}
+  .tdone{margin-left:auto; font-size:13px; color:var(--mut); white-space:nowrap;}
+  .rows{padding:2px 12px 12px;}
+  .row{display:flex; align-items:center; gap:10px; padding:11px 10px; border-top:1px solid rgba(255,255,255,.05); flex-wrap:wrap;}
+  .stitle{flex:1 1 240px; min-width:190px; font-size:14px;}
+  .prodtag{font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600; white-space:nowrap;}
+  .p-yes{background:rgba(52,211,153,.16); color:var(--green);}
+  .p-no{background:rgba(255,255,255,.06); color:var(--mut);}
+  .platforms{display:flex; gap:4px; flex-wrap:wrap;}
+  .chk{display:flex; align-items:center; gap:5px; font-size:12px; color:var(--mut); cursor:pointer; padding:4px 8px; border-radius:8px; border:1px solid transparent;}
+  .chk:hover{border-color:var(--line);}
+  .chk input{accent-color:var(--violet); width:15px; height:15px; cursor:pointer;}
+  .chk.full{color:var(--green);}
+  footer{text-align:center; color:var(--mut); font-size:12px; margin-top:30px; line-height:1.8;}
+  .reset{background:rgba(255,255,255,.06); color:var(--mut); border:1px solid var(--line); border-radius:10px; padding:8px 14px; cursor:pointer; font-size:12px;}
+  .reset:hover{color:var(--txt);}
+  .legend{display:flex; gap:18px; flex-wrap:wrap; font-size:12px; color:var(--mut); margin-bottom:18px;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .dot{width:11px; height:11px; border-radius:4px;}
+  .sched-card{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:18px 20px; margin-bottom:26px;}
+  .day{font-size:13px; padding:6px 14px; border-radius:20px; background:rgba(139,92,246,.18); border:1px solid var(--line); color:var(--violet2); font-weight:600;}
+  .sched{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px;}
+  .slot{display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:12px; padding:12px 14px;}
+  .slot .hr{font-size:21px; font-weight:800; color:#fff; min-width:62px;}
+  .slot .pf{font-size:13px; color:var(--mut);}
+  input[type=date]{background:rgba(255,255,255,.06); color:var(--txt); border:1px solid var(--line); border-radius:10px; padding:7px 11px; font-size:13px; font-family:inherit;}
+  .cal-row{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--line); margin-bottom:8px; flex-wrap:wrap;}
+  .cal-row.cal-done{opacity:.55;}
+  .cal-d{min-width:96px; font-weight:700; color:#fff; font-size:14px; text-transform:capitalize;}
+  .cal-t{flex:1 1 190px; font-size:14px;}
+  .cal-bd{font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600;}
+  .cal-h{font-size:12px; color:var(--mut); white-space:nowrap;}
+  .cal-ck{font-size:12px; font-weight:600; min-width:84px; text-align:right;}
+  .tabs{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
+  .tab{background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--mut); padding:10px 18px; border-radius:12px; cursor:pointer; font-size:14px; font-family:inherit; font-weight:600;}
+  .tab.on{background:rgba(139,92,246,.22); color:#fff; border-color:var(--violet);}
+  .g-card{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:18px 20px; margin-bottom:16px;}
+  .g-h{font-size:17px; font-weight:600; margin-bottom:8px;}
+  .g-p{font-size:14px; color:var(--mut); line-height:1.7; margin-bottom:14px;}
+  .g-p b{color:var(--txt);}
+  .g-tip{font-size:12px; color:var(--violet2); background:rgba(139,92,246,.1); border-left:3px solid var(--violet); border-radius:0 8px 8px 0; padding:9px 12px; margin-top:10px; line-height:1.6;}
+  .profiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;}
+  .pf{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:14px; padding:12px;}
+  .pf-top{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .pf-eye{width:38px; height:38px; border-radius:50%; flex:0 0 auto; position:relative; background:conic-gradient(from 0deg,#8B5CF6,#38E0D0,#34d399,#E8A53D,#E0218A,#8B5CF6);}
+  .pf-eye::after{content:""; position:absolute; inset:36%; border-radius:50%; background:#08030f;}
+  .pf-n{font-size:13px; font-weight:700; color:#fff;}
+  .pf-u{font-size:11px; color:var(--mut);}
+  .pf-pill{font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; display:inline-block;}
+  .pf-yt{background:rgba(226,75,75,.18); color:#F09595;}
+  .pf-tt{background:rgba(56,224,208,.16); color:#5DCAA5;}
+  .pf-ig{background:rgba(224,33,138,.18); color:#ED93B1;}
+  .pf-fb{background:rgba(55,138,221,.18); color:#85B7EB;}
+  .g-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:12px;}
+  .g-mini{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:14px; padding:14px 16px;}
+  .g-mini h4{font-size:14px; margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+  .g-mini ul{list-style:none; font-size:12.5px; color:var(--mut); line-height:1.75;}
+  .g-mini li{padding-left:14px; position:relative;}
+  .g-mini li::before{content:"·"; position:absolute; left:2px; color:var(--violet2); font-weight:800;}
+  .bio-mock{background:#0d0820; border:1px dashed var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:var(--txt); margin-top:6px;}
+  .bio-mock .muted{color:var(--mut);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eye" aria-hidden="true"></div>
+    <div>
+      <h1>ESPECTRO</h1>
+      <div class="tag">SEXUALIDAD · CIENCIA · CULTURA</div>
+      <div class="sub">Cronograma de producción · Temporada 1 · 10 temas · ~36 shorts</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button id="tb1" class="tab on" onclick="showTab(1)">Cronograma</button>
+    <button id="tb2" class="tab" onclick="showTab(2)">Guía de canales</button>
+  </div>
+
+  <div id="tab-crono">
+  <div class="legend">
+    <span><span class="dot" style="background:var(--green)"></span>Producido (lo actualiza Claude)</span>
+    <span><span class="dot" style="background:var(--violet)"></span>Subido a una red (lo marcas tú)</span>
+    <span><span class="dot" style="background:#5DCAA5"></span>Tier 1</span>
+    <span><span class="dot" style="background:#EF9F27"></span>Tier 2</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="s-prod">0/36</div><div class="l">Producidos</div><div class="bar"><i id="b-prod"></i></div></div>
+    <div class="stat"><div class="n" id="s-pub">0/36</div><div class="l">Publicados (4 redes)</div><div class="bar"><i id="b-pub"></i></div></div>
+    <div class="stat"><div class="n" id="s-posts">0/144</div><div class="l">Subidas totales</div><div class="bar"><i id="b-posts"></i></div></div>
+    <div class="stat"><div class="n">3/sem</div><div class="l">Lun · Mié · Vie · 20:00 CDMX</div></div>
+  </div>
+
+  <div class="next">
+    <div><div class="k">SIGUIENTE PASO</div><div class="v" id="next-v">—</div></div>
+    <div class="pill" id="next-pill"></div>
+  </div>
+
+  <div class="sched-card">
+    <div style="font-size:17px; font-weight:600; margin-bottom:4px;">Horario de publicación · 3 shorts/semana</div>
+    <div style="font-size:13px; color:var(--mut); margin-bottom:16px;">Días fijos (el algoritmo aprende tu ritmo) · hora CDMX · franja tarde-noche = mayor alcance en LatAm</div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+      <span class="day">Lunes</span><span class="day">Miércoles</span><span class="day">Viernes</span>
+    </div>
+    <div style="font-size:12px; color:var(--violet2); margin-bottom:10px; letter-spacing:2px;">RUTINA DE CADA DÍA · sube uno tras otro (~20 min entre cada uno)</div>
+    <div class="sched">
+      <div class="slot"><span class="hr">19:30</span><span class="pf">YouTube Shorts</span></div>
+      <div class="slot"><span class="hr">19:50</span><span class="pf">TikTok</span></div>
+      <div class="slot"><span class="hr">20:10</span><span class="pf">Instagram Reels</span></div>
+      <div class="slot"><span class="hr">20:30</span><span class="pf">Facebook Reels</span></div>
+    </div>
+    <div style="font-size:12px; color:var(--mut); margin-top:16px; line-height:1.7;">
+      <b style="color:var(--txt)">Por qué escalonado:</b> subes sin estrés y cada red recibe el video en su pico de la tarde.<br>
+      <b style="color:var(--txt)">2.º bloque opcional</b> (al escalar a 4-5/sem): mediodía 13:00–14:00 CDMX.<br>
+      <b style="color:var(--gold)">Importante:</b> a las 2-3 semanas ajusta estas horas con la actividad real de TUS seguidores (panel de cada app).
+    </div>
+  </div>
+
+  <div class="sched-card">
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+      <div style="font-size:17px; font-weight:600;">Calendario de estrenos</div>
+      <label style="font-size:13px; color:var(--mut); margin-left:auto;">Primer lunes: <input type="date" id="startDate"></label>
+    </div>
+    <div id="cal"></div>
+    <div style="font-size:12px; color:var(--mut); margin-top:10px; line-height:1.7;">Cada estreno se sube a las 4 redes ese día (19:30 YT · 19:50 TikTok · 20:10 IG · 20:30 FB). El orden respeta el balance de tiers. Cambia la fecha de inicio y se recalcula solo.</div>
+  </div>
+
+  <div id="temas"></div>
+
+  <footer>
+    <b style="color:var(--green)">Producido</b> lo marca Claude al terminar cada short. Las redes (<b>YT/TikTok/IG/FB</b>) las marcas tú al subir.<br>
+    Tu marcado de redes se guarda en este navegador. Mantén el archivo en su carpeta y usa siempre el mismo navegador.<br><br>
+    <button class="reset" onclick="if(confirm('¿Borrar tus marcas de subida?')){localStorage.removeItem(KEY);location.reload();}">Reiniciar mis marcas</button>
+  </footer>
+  </div>
+
+  <div id="tab-guia" style="display:none">
+    <p style="color:var(--mut); font-size:14px; margin-bottom:20px; line-height:1.7;">Como director de marca: lo que hace crecer un canal nuevo en 2026 es <b style="color:var(--txt)">identidad consistente + hook en los primeros 2 segundos + subtítulos siempre</b>. Aquí va tu manual.</p>
+
+    <div class="g-card">
+      <div class="g-h">1 · Marca unificada en las 4 redes</div>
+      <p class="g-p">Mismo <b>@usuario</b>, misma <b>foto</b> (tu Ojo Espectral) y mismo <b>nombre</b> en todas. Reconocimiento instantáneo y te encuentran igual en cualquier lado.</p>
+      <div class="profiles">
+        <div class="pf"><div class="pf-top"><div class="pf-eye"></div><div><div class="pf-n">ESPECTRO</div><div class="pf-u">@espectro.educativo</div></div></div><span class="pf-pill pf-yt">YouTube</span></div>
+        <div class="pf"><div class="pf-top"><div class="pf-eye"></div><div><div class="pf-n">ESPECTRO</div><div class="pf-u">@espectro.educativo</div></div></div><span class="pf-pill pf-tt">TikTok</span></div>
+        <div class="pf"><div class="pf-top"><div class="pf-eye"></div><div><div class="pf-n">ESPECTRO</div><div class="pf-u">@espectro.educativo</div></div></div><span class="pf-pill pf-ig">Instagram</span></div>
+        <div class="pf"><div class="pf-top"><div class="pf-eye"></div><div><div class="pf-n">ESPECTRO</div><div class="pf-u">@espectro.educativo</div></div></div><span class="pf-pill pf-fb">Facebook</span></div>
+      </div>
+      <div class="g-tip">Por qué: un handle único multiplica el recuerdo de marca y deja que tu público salte de una red a otra sin equivocarse. Revisa que el @ esté libre en las 4 antes de fijarlo.</div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">2 · Tu bio (fórmula que convierte)</div>
+      <p class="g-p">3 líneas: qué eres + por qué seguirte + cuándo publicas.</p>
+      <div class="bio-mock">
+        🔭 La ciencia que nadie te explicó sobre identidad y sexualidad.<br>
+        <span class="muted">Evidencia · sin tabúes · sin juicios.</span><br>
+        <span class="muted">🗓️ Nuevos shorts Lun · Mié · Vie</span>
+      </div>
+      <div class="g-tip">Por qué: en 2 segundos el visitante decide si te sigue. La bio dice qué gana y con qué frecuencia — sin misterio.</div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">3 · Foto y portada</div>
+      <p class="g-p"><b>Foto de perfil:</b> tu Ojo Espectral (medallón), idéntico en las 4. <b>Banner/portada</b> (YouTube): el logo + "SEXUALIDAD · CIENCIA · CULTURA" + tu horario.</p>
+      <div class="g-tip">Por qué: el ojo es tu sello; repetirlo crea memoria visual. Nunca lo deformes ni cambies de color.</div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">4 · Cómo subir y personalizar — por plataforma</div>
+      <div class="g-grid">
+        <div class="g-mini">
+          <h4><span class="pf-pill pf-yt">YouTube Shorts</span></h4>
+          <ul>
+            <li>Vertical 9:16, 45–60s</li>
+            <li>Título = pregunta/promesa con palabra clave (≤80 car.)</li>
+            <li>1ª línea de descripción educativa + fuente + #Shorts</li>
+            <li>Marca "no es para niños" SIN 18+</li>
+            <li>Activa etiqueta de IA si la pide</li>
+            <li><b>Canal:</b> banner con logo, Shorts en playlists por tema, enlaces a TikTok/IG en "Acerca de"</li>
+          </ul>
+          <div class="g-tip">YouTube es buscador: los títulos con palabras clave te dan vistas por meses.</div>
+        </div>
+        <div class="g-mini">
+          <h4><span class="pf-pill pf-tt">TikTok</span></h4>
+          <ul>
+            <li>Vertical 9:16, 21–60s</li>
+            <li>Caption corto con gancho + 3–5 hashtags (nicho + amplio)</li>
+            <li>Portada con 3–4 palabras de texto</li>
+            <li>Etiqueta de contenido IA · NO marques 18+</li>
+            <li>Cuenta <b>Business/Creator</b></li>
+            <li><b>Perfil:</b> fija tus 3 mejores videos arriba, link a IG/YT</li>
+          </ul>
+          <div class="g-tip">El "Para ti" premia retención y rewatches → hook fuerte + loop al final.</div>
+        </div>
+        <div class="g-mini">
+          <h4><span class="pf-pill pf-ig">Instagram Reels</span></h4>
+          <ul>
+            <li>Vertical 9:16, 45–60s</li>
+            <li>1ª línea del caption educativa (se trunca pronto)</li>
+            <li>Portada manual que se vea bien en la cuadrícula</li>
+            <li>Cuenta <b>Creator</b> · etiqueta IA</li>
+            <li><b>Perfil:</b> Destacados, link en bio (Linktree), cuadrícula coherente</li>
+          </ul>
+          <div class="g-tip">Aquí mandan <b>guardados y compartidos</b> → cierra con "guárdalo / mándaselo a alguien".</div>
+        </div>
+        <div class="g-mini">
+          <h4><span class="pf-pill pf-fb">Facebook Reels</span></h4>
+          <ul>
+            <li>Mismo máster 9:16, sin marca de agua</li>
+            <li>Descripción puede asumir audiencia algo mayor</li>
+            <li>Publica desde una <b>Página</b> (no perfil personal)</li>
+            <li><b>Página:</b> foto = Ojo, sección de info, enlaza tu IG (Meta los conecta)</li>
+          </ul>
+          <div class="g-tip">Audiencia +35 y alcance orgánico aún sólido en Reels: público que las otras redes no te dan.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">5 · El primer fotograma (lo más subestimado)</div>
+      <p class="g-p">El primer frame es tu miniatura en el feed. Que tenga el <b>logo</b> + 3–4 palabras del gancho. Decide el clic antes de que escuchen una sola palabra.</p>
+      <div class="g-tip">Sube el CTR sin clickbait: promesa de comprensión, no exageración (regla de marca).</div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">6 · Tendencias 2026 — úsalas a tu favor</div>
+      <div class="g-grid">
+        <div class="g-mini"><h4>⚡ Hook en 1–2s</h4><ul><li>Si no enganchas en 2s, te hacen swipe. La frase más fuerte va primero.</li></ul></div>
+        <div class="g-mini"><h4>💬 Subtítulos siempre</h4><ul><li>La mayoría ve sin sonido. Texto quemado = más retención.</li></ul></div>
+        <div class="g-mini"><h4>🔢 Series numeradas</h4><ul><li>"Mito #1, #2…" generan binge y te hacen volver. Ya lo tienes en el plan.</li></ul></div>
+        <div class="g-mini"><h4>🎵 Identidad sonora</h4><ul><li>Tu cortinilla + Ojo en cada video = marca reconocible al instante.</li></ul></div>
+        <div class="g-mini"><h4>🗣️ Responde con video</h4><ul><li>Contesta comentarios con un Short: comunidad + ideas gratis de contenido.</li></ul></div>
+        <div class="g-mini"><h4>📲 Nativo en cada red</h4><ul><li>Sube el archivo limpio en cada app; nunca reposts con marca de agua (penaliza).</li></ul></div>
+      </div>
+      <div class="g-tip">Las plataformas cambian seguido: confirma formatos y políticas en los recursos de creador de cada app cada ~3 meses.</div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-h">7 · "Vincular" tus canales (lo que de verdad se puede)</div>
+      <p class="g-p">No existe unir cuentas entre plataformas (cada red es su mundo). La forma real de conectarlas:</p>
+      <div class="g-mini" style="margin-bottom:0;"><ul>
+        <li>Mismo <b>@handle</b> en las 4 (lo del punto 1)</li>
+        <li>Pon el <b>link de unas en la bio de otras</b> (TikTok e IG permiten enlazar otras redes; YouTube en "enlaces del canal")</li>
+        <li><b>Meta conecta IG ↔ Facebook</b> desde el Business Suite (publicas una vez para las dos)</li>
+        <li>Menciona tus otras redes al final de algunos videos</li>
+      </ul></div>
+      <div class="g-tip">Resultado: tu audiencia rebota entre tus redes y te sigue en todas, no solo en una.</div>
+    </div>
+  </div>
+
+<script>
+const KEY='espectro-uploads-v2';
+const PLAT=[['yt','YT'],['tt','TikTok'],['ig','IG'],['fb','FB']];
+// ── ESTADO DE PRODUCCIÓN (lo mantiene Claude editando este bloque) ──
+const DATA=[
+ {n:1,title:'Las 3 dimensiones',tier:1,shorts:[
+   {t:'Las 3 dimensiones (intro)',prod:true},{t:'El sexo biológico a fondo',prod:false},{t:'Identidad: qué dice el cerebro',prod:false},{t:'Orientación: el mito de la elección',prod:false}]},
+ {n:2,title:'Anatomía y biología del sexo',tier:2,shorts:[
+   {t:'¿Qué define el sexo biológico?',prod:false},{t:'Intersexualidad: más común de lo que crees',prod:false},{t:'Cromosomas y hormonas',prod:false}]},
+ {n:3,title:'Identidad de género',tier:1,shorts:[
+   {t:'¿Qué es la identidad de género?',prod:false},{t:'No es una decisión: la neurociencia',prod:false},{t:'Identidad ≠ orientación',prod:false},{t:'Disforia: qué es y qué no',prod:false}]},
+ {n:4,title:'Orientación: el espectro',tier:1,shorts:[
+   {t:'El espectro de la orientación',prod:false},{t:'La escala de Kinsey',prod:false},{t:'Bisexualidad y pansexualidad',prod:false},{t:'Orientación no es comportamiento',prod:false}]},
+ {n:5,title:'Atracción romántica vs sexual',tier:1,shorts:[
+   {t:'Romántico vs sexual',prod:true},{t:'¿Se puede amar sin desear?',prod:false},{t:'Cuando van a personas distintas',prod:false}]},
+ {n:6,title:'Asexualidad y arromanticidad',tier:2,shorts:[
+   {t:'¿Qué es la asexualidad?',prod:false},{t:'Arromanticidad explicada',prod:false},{t:'Mitos sobre la asexualidad',prod:false}]},
+ {n:7,title:'Terminología correcta',tier:1,shorts:[
+   {t:'Términos que usas mal',prod:false},{t:'Sexo, género y orientación',prod:false},{t:'Cómo preguntar con respeto',prod:false}]},
+ {n:8,title:'Historia y culturas',tier:1,shorts:[
+   {t:'Cómo otras culturas vieron el género',prod:false},{t:'Las personas de dos espíritus',prod:false},{t:'Historia LGBT+ en breve',prod:false},{t:'Lo que la historia nos enseña',prod:false}]},
+ {n:9,title:'Mitos desmontados',tier:1,shorts:[
+   {t:'Mito #1: es solo una fase',prod:true},{t:'Mito #2',prod:false},{t:'Mito #3',prod:false},{t:'Mito #4',prod:false},{t:'Mito #5',prod:false}]},
+ {n:10,title:'Cómo apoyar a alguien',tier:1,shorts:[
+   {t:'Cuando alguien sale del clóset',prod:false},{t:'Qué NO decir',prod:false},{t:'El poder de escuchar',prod:false}]},
+];
+const ORDER=['t9s1','t1s1','t5s1','t2s1','t3s1','t4s1','t9s2','t5s2','t6s1','t7s1','t8s1','t9s3','t1s2','t3s2','t4s2','t10s1'];
+let UP=JSON.parse(localStorage.getItem(KEY)||'{}');
+function gu(id){return UP[id]||(UP[id]={});}
+function save(){localStorage.setItem(KEY,JSON.stringify(UP)); if(window.pushRemote)window.pushRemote();}
+
+function render(){
+  const root=document.getElementById('temas'); root.innerHTML='';
+  DATA.forEach(t=>{
+    let done=0;
+    const card=document.createElement('div'); card.className='tema';
+    const rows=document.createElement('div'); rows.className='rows';
+    t.shorts.forEach((sh,i)=>{
+      const id='t'+t.n+'s'+(i+1); const u=gu(id);
+      const allPub=PLAT.every(p=>u[p[0]]); if(allPub) done++;
+      const row=document.createElement('div'); row.className='row';
+      const ti=document.createElement('div'); ti.className='stitle'; ti.textContent=(i+1)+'. '+sh.t;
+      row.appendChild(ti);
+      const pt=document.createElement('span'); pt.className='prodtag '+(sh.prod?'p-yes':'p-no');
+      pt.textContent=sh.prod?'✓ Producido':'pendiente'; row.appendChild(pt);
+      const pl=document.createElement('div'); pl.className='platforms';
+      PLAT.forEach(p=>{
+        const w=document.createElement('label'); w.className='chk'+(allPub?' full':'');
+        const c=document.createElement('input'); c.type='checkbox'; c.checked=!!u[p[0]];
+        c.onchange=()=>{u[p[0]]=c.checked; save(); render();};
+        w.appendChild(c); w.appendChild(document.createTextNode(p[1])); pl.appendChild(w);
+      });
+      row.appendChild(pl); rows.appendChild(row);
+    });
+    const head=document.createElement('div'); head.className='thead';
+    head.innerHTML='<div class="tnum">'+t.n+'</div><div class="ttitle">'+t.title+'</div>'+
+      '<span class="badge '+(t.tier===1?'b-t1':'b-t2')+'">Tier '+t.tier+'</span>'+
+      '<div class="tdone">'+done+'/'+t.shorts.length+' publicados</div>';
+    head.onclick=()=>{rows.style.display=rows.style.display==='none'?'':'none';};
+    card.appendChild(head); card.appendChild(rows); root.appendChild(card);
+  });
+  updateStats();
+}
+function updateStats(){
+  let prod=0,pub=0,posts=0,total=0;
+  DATA.forEach(t=>t.shorts.forEach((sh,i)=>{
+    total++; if(sh.prod)prod++;
+    const u=gu('t'+t.n+'s'+(i+1)); const pc=PLAT.filter(p=>u[p[0]]).length; posts+=pc; if(pc===4)pub++;
+  }));
+  set('s-prod',prod+'/'+total,'b-prod',prod/total);
+  set('s-pub',pub+'/'+total,'b-pub',pub/total);
+  set('s-posts',posts+'/'+(total*4),'b-posts',posts/(total*4));
+  let nextId=ORDER.find(id=>{const u=UP[id]||{};return !PLAT.every(p=>u[p[0]]);});
+  if(!nextId){for(const t of DATA){for(let i=0;i<t.shorts.length;i++){const id='t'+t.n+'s'+(i+1);const u=UP[id]||{};if(!PLAT.every(p=>u[p[0]])){nextId=id;break;}}if(nextId)break;}}
+  const nv=document.getElementById('next-v'), np=document.getElementById('next-pill');
+  if(nextId){const m=nextId.match(/t(\d+)s(\d+)/); const t=DATA[m[1]-1]; const sh=t.shorts[m[2]-1];
+    nv.textContent=sh.t; np.textContent='Tema '+t.n+' · '+nextId.toUpperCase()+' · Tier '+t.tier+(sh.prod?' · listo para subir':' · falta producir');
+  }else{nv.textContent='¡Temporada completa! 🎉'; np.textContent='';}
+  renderCal();
+}
+function set(id,txt,bar,frac){document.getElementById(id).textContent=txt;document.getElementById(bar).style.width=Math.round(frac*100)+'%';}
+function showTab(n){
+  document.getElementById('tab-crono').style.display=n===1?'':'none';
+  document.getElementById('tab-guia').style.display=n===2?'':'none';
+  document.getElementById('tb1').classList.toggle('on',n===1);
+  document.getElementById('tb2').classList.toggle('on',n===2);
+}
+
+const SD_KEY='espectro-start';
+const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIA=['dom','lun','mar','mié','jue','vie','sáb'];
+function getStart(){
+  let v=localStorage.getItem(SD_KEY);
+  if(!v){const t=new Date(); const day=t.getDay(); const add=((8-day)%7)||7; const m=new Date(t); m.setDate(t.getDate()+add); v=m.toISOString().slice(0,10);}
+  return v;
+}
+function renderCal(){
+  const el=document.getElementById('cal'); if(!el)return;
+  const inp=document.getElementById('startDate'); if(!inp.value)inp.value=getStart();
+  const start=new Date(inp.value+'T00:00:00'); el.innerHTML='';
+  ORDER.forEach((id,i)=>{
+    const m=id.match(/t(\d+)s(\d+)/); const t=DATA[m[1]-1]; const sh=t.shorts[m[2]-1];
+    const wk=Math.floor(i/3), off=[0,2,4][i%3];
+    const d=new Date(start); d.setDate(start.getDate()+wk*7+off);
+    const u=UP[id]||{}; const pub=PLAT.every(p=>u[p[0]]);
+    const ck = pub?'<span class="cal-ck" style="color:var(--green)">✓ subido</span>'
+      :(sh.prod?'<span class="cal-ck" style="color:var(--violet2)">listo</span>'
+      :'<span class="cal-ck" style="color:var(--mut)">por producir</span>');
+    const row=document.createElement('div'); row.className='cal-row'+(pub?' cal-done':'');
+    row.innerHTML='<span class="cal-d">'+DIA[d.getDay()]+' '+d.getDate()+' '+MES[d.getMonth()]+'</span>'+
+      '<span class="cal-t">'+sh.t+'</span>'+
+      '<span class="cal-bd '+(t.tier===1?'b-t1':'b-t2')+'">T'+t.n+' · Tier '+t.tier+'</span>'+
+      '<span class="cal-h">19:30–20:30</span>'+ck;
+    el.appendChild(row);
+  });
+}
+document.getElementById('startDate').addEventListener('change',e=>{localStorage.setItem(SD_KEY,e.target.value); renderCal(); if(window.pushRemote)window.pushRemote();});
+window.getLocalState=function(){return {uploads:UP, start:(document.getElementById('startDate').value||getStart())};};
+window.applyRemote=function(d){ if(d&&d.uploads){UP=d.uploads; localStorage.setItem(KEY,JSON.stringify(UP));} if(d&&d.start){localStorage.setItem(SD_KEY,d.start); const i=document.getElementById('startDate'); if(i)i.value=d.start;} render(); };
+render();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  const SB_URL='https://ulexosqorgsvrsbkwklh.supabase.co';
+  const SB_KEY='sb_publishable_6qXmOY69AZC9hEAigwe0xQ_HadPxE8u';
+  const ROW='espectro';
+  if(!window.supabase){console.warn('Supabase no cargó (sin internet o CDN bloqueado). El tracker sigue funcionando local.');return;}
+  const sb=window.supabase.createClient(SB_URL,SB_KEY);
+  let applying=false, deb=null;
+  window.pushRemote=function(){
+    if(applying)return;
+    clearTimeout(deb);
+    deb=setTimeout(async()=>{
+      try{ await sb.from('tracker').upsert({id:ROW,data:window.getLocalState(),updated_at:new Date().toISOString()}); }catch(e){console.warn(e);}
+    },250);
+  };
+  async function pull(){
+    try{
+      const {data,error}=await sb.from('tracker').select('data').eq('id',ROW).maybeSingle();
+      if(!error && data && data.data){ applying=true; window.applyRemote(data.data); applying=false; }
+    }catch(e){console.warn(e);}
+  }
+  pull();
+  sb.channel('tracker-rt')
+    .on('postgres_changes',{event:'*',schema:'public',table:'tracker'},p=>{
+      if(p.new && p.new.data){ applying=true; window.applyRemote(p.new.data); applying=false; }
+    })
+    .subscribe();
+})();
+</script>
+</body>
+</html>
