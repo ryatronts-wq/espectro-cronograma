@@ -629,7 +629,7 @@ const DATA=[
  {n:10,title:'Cómo apoyar a alguien',tier:1,shorts:[
    {t:'Cuando alguien sale del clóset',prod:false},{t:'Qué NO decir',prod:false},{t:'El poder de escuchar',prod:false}]},
 ];
-const ORDER=['t9s1','t1s1','t5s1','t2s1','t3s1','t4s1','t9s2','t5s2','t6s1','t7s1','t8s1','t9s3','t1s2','t3s2','t4s2','t10s1'];
+const ORDER=['t1s1','t5s1','t9s1','t2s1','t3s1','t4s1','t9s2','t6s1','t9s3','t5s2','t7s1','t8s1','t1s2','t3s2','t4s2','t10s1'];
 let UP=JSON.parse(localStorage.getItem(KEY)||'{}');
 function gu(id){return UP[id]||(UP[id]={});}
 function save(){localStorage.setItem(KEY,JSON.stringify(UP)); if(window.pushRemote)window.pushRemote();}
