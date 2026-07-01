@@ -632,7 +632,7 @@ const DATA=[
 const ORDER=['t1s1','t5s1','t9s1','t2s1','t3s1','t4s1','t9s2','t6s1','t9s3','t5s2','t7s1','t8s1','t1s2','t3s2','t4s2','t10s1'];
 let UP=JSON.parse(localStorage.getItem(KEY)||'{}');
 function gu(id){return UP[id]||(UP[id]={});}
-function save(){localStorage.setItem(KEY,JSON.stringify(UP)); if(window.pushRemote)window.pushRemote();}
+function save(){window.DIRTY=true; localStorage.setItem(KEY,JSON.stringify(UP)); if(window.pushRemote)window.pushRemote();}
 
 function render(){
   const root=document.getElementById('temas'); root.innerHTML='';
@@ -732,30 +732,44 @@ render();
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
-  const SB_URL='https://ulexosqorgsvrsbkwklh.supabase.co';
-  const SB_KEY='sb_publishable_6qXmOY69AZC9hEAigwe0xQ_HadPxE8u';
+  const SB_URL='https://pjtcqebgyoblrrdjtthi.supabase.co';
+  const SB_KEY='sb_publishable_EDpgOAJ0vQmRr6a2gdhSAQ_rHG4DEGe';
   const ROW='espectro';
   if(!window.supabase){console.warn('Supabase no cargó (sin internet o CDN bloqueado). El tracker sigue funcionando local.');return;}
   const sb=window.supabase.createClient(SB_URL,SB_KEY);
-  let applying=false, deb=null;
+  // id único por pestaña → permite ignorar el eco de MIS propios cambios (evita que las marcas se reviertan solas)
+  const CLIENT_ID=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('c'+Math.random().toString(36).slice(2)+Date.now());
+  let lastTs=0, deb=null;
+  if(typeof window.DIRTY==='undefined')window.DIRTY=false;
   window.pushRemote=function(){
-    if(applying)return;
     clearTimeout(deb);
     deb=setTimeout(async()=>{
-      try{ await sb.from('tracker').upsert({id:ROW,data:window.getLocalState(),updated_at:new Date().toISOString()}); }catch(e){console.warn(e);}
+      const ts=Date.now();
+      try{
+        await sb.from('tracker').upsert({id:ROW,data:Object.assign(window.getLocalState(),{by:CLIENT_ID,ts:ts}),updated_at:new Date().toISOString()});
+        if(ts>lastTs)lastTs=ts;
+      }catch(e){console.warn(e);}
+      finally{window.DIRTY=false;}
     },250);
   };
+  function maybeApply(d){
+    if(!d)return;
+    if(d.by===CLIENT_ID)return;      // es el eco de MI propio cambio → no lo apliques
+    if(window.DIRTY)return;           // tengo una marca local sin subir todavía → la mía manda
+    if(d.ts&&d.ts<=lastTs)return;     // eco viejo o fuera de orden → ignóralo
+    if(d.ts)lastTs=d.ts;
+    window.applyRemote(d);
+  }
   async function pull(){
     try{
       const {data,error}=await sb.from('tracker').select('data').eq('id',ROW).maybeSingle();
-      if(!error && data && data.data){ applying=true; window.applyRemote(data.data); applying=false; }
+      if(!error&&data&&data.data)maybeApply(data.data);
     }catch(e){console.warn(e);}
   }
   pull();
+  if(window.DIRTY)window.pushRemote();   // por si marcaste algo antes de que cargara Supabase
   sb.channel('tracker-rt')
-    .on('postgres_changes',{event:'*',schema:'public',table:'tracker'},p=>{
-      if(p.new && p.new.data){ applying=true; window.applyRemote(p.new.data); applying=false; }
-    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'tracker'},p=>{ if(p.new)maybeApply(p.new.data); })
     .subscribe();
 })();
 </script>
